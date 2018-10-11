@@ -1,5 +1,6 @@
+
 import sys
-sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')  #主要针对my system
+sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')  # mainly aimed at  my system
 
 import json
 from os.path import join, dirname
@@ -45,18 +46,17 @@ from utils.inference import load_detection_model
 from utils.preprocessor import preprocess_input
 
 #htitch = im_out = np.zeros((400, 800, 3), np.uint8);
-dict = {'longOrShort': 0, 'color': 0}  #0:不理发 1:长发 2:短发  0:不染发 1:红色 2:黄色
+dict = {'longOrShort': 0, 'color': 0}  #0: no haircut  1:long hair 2:short hair  0: no hair dyed  1:red 2:yellow
 menPath = {'1': './men/1.jpg', '2': './men/2.jpg', '3': './men/3.jpg', '4': './men/4.jpg', '5': './men/5.jpg', '6': './men/7.jpg'}
 ###########################################################
-#功能：心情分析、性别分析、界面显示
-#说明：子线程
-#操作：无
+#function： mood analysis, gender analysis, interface display 
+#explain：thread
 ###########################################################
 
-def face_gender(inf, inf3):                                   #休眠5ms
+def face_gender(inf, inf3):                     #sleep 5ms
 
-	#cv2.namedWindow('AI3',0)               #创建窗口
-	#cv2.resizeWindow('AI3', 800, 400);   #创建一个640*480大小的窗口
+	#cv2.namedWindow('AI3',0)               #new window
+	#cv2.resizeWindow('AI3', 800, 400);     #640*480
 	cap = cv2.VideoCapture('1.avi')
 	currentFrame = 0
 	totalFrame = cap.get(7)
@@ -97,11 +97,11 @@ def face_gender(inf, inf3):                                   #休眠5ms
 	menNumber = 0
 	womenNumber = 0
 	showHairStatus = 0
-#图像大小为400 * 400
+
 	while 1:
 
 		time.sleep(0.01)
-		#cv2.imshow("AI", frame)  # 显示帧
+		#cv2.imshow("AI", frame)  # show fps
 		currentFrame += 1
 		#print (currentFrame)
 		if currentFrame >= (totalFrame - 1):
@@ -210,7 +210,7 @@ def face_gender(inf, inf3):                                   #休眠5ms
 			menNumber = 0
 			showHairStatus = 1
 		if showHairStatus == 0:
-			ret,frame = cap.read()  # 获取图像
+			ret,frame = cap.read()  # get image
 		if showHairStatus == 1:
 			displayTimes += 1
 			if displayTimes >= 150:
@@ -227,14 +227,13 @@ def face_gender(inf, inf3):                                   #休眠5ms
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
 
-def robot(inf, inf2, inf3):                              #休眠5ms
+def robot(inf, inf2, inf3):                        
 	resultNumber = 0 
-	while 1:                                   #休眠5ms
+	while 1:                                   #sleep 5ms
 		time.sleep(0.01)
-		CHUNK = 1024                       #块
+		CHUNK = 1024                       #block
 ###########################################################
-#功能：语音转化为文字
-#操作：
+#function：speech to text
 ###########################################################
 		while inf2.get():
 			time.sleep(0.01)
@@ -246,7 +245,7 @@ def robot(inf, inf2, inf3):                              #休眠5ms
 						content_type='audio/wav',
 						timestamps=False,
 						word_confidence=False)['results']
-				if speechTxt == []:                              #解决语音内容为空的问题
+				if speechTxt == []:                              # voice to text is empty
 					print ('Restart:')
 					break
 				res = json.dumps(
@@ -257,18 +256,17 @@ def robot(inf, inf2, inf3):                              #休眠5ms
 
 
 ###########################################################
-#功能：机器人对话
-#操作：
+#function：chat robot
 ###########################################################
 			input = {'text': res}
 			response = conversation.message(workspace_id=workspace_id,
 				                input=input)
-			if response['output']['text'] == []:                   #解决无法匹配意图
+			if response['output']['text'] == []:                   #solution no intention
 				#print (response)
 				print ('Restart:')
 				break
 			#print (response['intents'][0]['intent'])
-			if (response['intents']) == []:                     #意图为空  
+			if (response['intents']) == []:                     #intention is null  
 				print ('Restart:')				
 				break
 			if response['intents'][0]['intent'] == 'longHair':
@@ -292,12 +290,11 @@ def robot(inf, inf2, inf3):                              #休眠5ms
 				inf3.put(resultNumber)
 				
 
-#***************************字符串比较区域******************
-#统计当前的信息
+#***********************string comparison**********************
+
 
 ###########################################################
-#功能：文本转化为语音
-#操作：
+#function：text to speech
 ###########################################################
 			text = response['output']['text'][0]
 			print (text)
@@ -328,20 +325,20 @@ def robot(inf, inf2, inf3):                              #休眠5ms
 			stream.close()
 			p.terminate()
 			print ('Restart:')
-			break                                               #使程序跳出当前循环，否则一直循环上次内容
+			break                                               #break
 
 	cv2.destroyAllWindows()
 
 
-def speechQicuk(inf, inf2):                              #休眠5ms
+def speechQicuk(inf, inf2):                              #sleep 5ms
 	global htitch
 	while 1:
 
 		time.sleep(0.01)
-		CHUNK = 1024                        #块
-		FORMAT = pyaudio.paInt16            #音频格式
-		CHANNELS = 2                        #设置通道数
-		RATE = 44100                        #帧数
+		CHUNK = 1024                        #block
+		FORMAT = pyaudio.paInt16            #
+		CHANNELS = 2                        #
+		RATE = 44100                        #fps
 		RECORD_SECONDS = 5                 
 		WAVE_OUTPUT_FILENAME = "output.wav" #
 		p = pyaudio.PyAudio()
@@ -350,8 +347,8 @@ def speechQicuk(inf, inf2):                              #休眠5ms
 		recordFlag = 0
 		firstDisposeFlag = 0
 
-		cv2.namedWindow('control',0)               #创建窗口
-		cv2.resizeWindow('control', 200, 200);   #创建一个640*480大小的窗口
+		cv2.namedWindow('control',0)            
+		cv2.resizeWindow('control', 200, 200);  
 		speechImg = cv2.imread('1.jpg')
 		while 1:
 
@@ -362,10 +359,10 @@ def speechQicuk(inf, inf2):                              #休眠5ms
 			#	cv2.imshow('AI', inf.get())
 			cv2.waitKey(1)
 			cv2.imshow('control', speechImg)
-			if cv2.waitKey(1) == 98:           #代表'b'推出录音
+			if cv2.waitKey(1) == 98:           #'b' stop recording
 				if recordFlag == 2:
 					recordFlag = 1
-			if cv2.waitKey(1) == 97:           #代表'a'开始录音
+			if cv2.waitKey(1) == 97:           #'a' start recording
 				stream = p.open(format=FORMAT,
 			 	       channels=CHANNELS,
 			 	       rate=RATE,
@@ -395,9 +392,8 @@ def speechQicuk(inf, inf2):                              #休眠5ms
 		inf2.put(1)
 
 ###########################################################
-#功能：国际巨星理发店
-#说明：主线程
-#操作：无
+#fuction：Tony Plus
+#explain：main thread
 ###########################################################
 if __name__ == '__main__':
 	dataQueue = Queue()
@@ -420,21 +416,5 @@ if __name__ == '__main__':
 	#t1.start()
 	#t2.start()
 	#t3.start()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
